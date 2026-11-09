@@ -3,7 +3,7 @@ from datetime import date,timedelta
 U={"m":"https://gapi-ext.innodealing.com/dm-mcp-service/publicapi/mcp/v1/bond-market/","p":"https://gapi-ext.innodealing.com/dm-mcp-service/publicapi/mcp/v1/bond-primary/","f":"https://gapi-ext.innodealing.com/dm-mcp-service/publicapi/mcp/v1/money-market/"}
 def q(s,n,x):
  a={"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":n,"arguments":{"params":x}}};h={"Content-Type":"application/json","Accept":"application/json, text/event-stream","x-app-key":os.environ["DM_APP_KEY"],"x-app-secret":os.environ["DM_APP_SECRET"]}
- r=urllib.request.urlopen(urllib.request.Request(U[s],data=json.dumps(a).encode(),headers=h),timeout=30).read().decode();z=json.loads(next(v[6:] for v in r.splitlines() if v.startswith("data: ")))["result"];return json.loads(z["content"][0]["text"])["data"]
+ r=urllib.request.urlopen(urllib.request.Request(U[s],data=json.dumps(a).encode(),headers=h),timeout=30).read().decode();lines=[v[6:].strip() for v in r.splitlines() if v.startswith("data: ") and v[6:].strip()];z=json.loads(lines[-1])["result"];return json.loads(z["content"][0]["text"])["data"]
 t=date.today();a=t-timedelta(days=6);rows=[];x=t-timedelta(days=89)
 while x<=t:
  y=min(x+timedelta(days=29),t);rows+=q("m","bond_yield_curve",{"user_message":"国债10年收益率曲线","curve_name":"中债国债收益率曲线","curve_term_list":["10"],"curve_type":1,"data_source":18,"start_date":x.isoformat(),"end_date":y.isoformat()});x=y+timedelta(days=1)
