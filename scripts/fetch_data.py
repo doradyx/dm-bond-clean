@@ -10,14 +10,15 @@ URLS = {
 }
 
 
-def dm_call(service, tool_name, params):
+def dm_call(service, tool_name, arguments):
     payload = {
         "jsonrpc": "2.0",
         "id": 1,
         "method": "tools/call",
         "params": {
             "name": tool_name,
-            "arguments": {"params": params},
+            # DM MCP 要求参数直接写入 arguments，不能包一层 params
+            "arguments": arguments,
         },
     }
 
@@ -37,46 +38,57 @@ def dm_call(service, tool_name, params):
     with urllib.request.urlopen(request, timeout=30) as response:
         raw = response.read().decode("utf-8")
 
-    # 读取 SSE 返回中的最后一条非空 data 行
-    lines = [
-        line[6:].strip()
-        for line in raw.splitlines()
-        if line.startswith("data: ") and line[6:].strip()
-    ]
+    for line in raw.splitlines():
+        if not line.startswith("data: "):
+            continue
 
-    if not lines:
-        raise RuntimeError(f"DM 返回为空：{raw[:500]}")
+        try:
+            event = json.loads(line[6:].strip())
+        except json.JSONDecodeError:
+            continue
 
-    result = json.loads(lines[-1])["result"]
-    text = result["content"][0]["text"].strip()
+        result = event.get("result", {})
 
-    if not text:
-        raise RuntimeError(f"DM 返回内容为空：{raw[:500]}")
+        if result.get("isError"):
+            content = result.get("content", [])
+            message = content[0].get("text", "DM 返回未知错误") if content else "DM 返回未知错误"
+            raise RuntimeError(message)
 
-    # DM 偶尔会拼接多段 JSON；只读取第一段完整 JSON
-    json_start = min(
-    position
-    for position in (text.find("{"), text.find("["))
-    if position >= 0
-)
+        content = result.get("content", [])
+        if not content:
+            continue
 
-    raise RuntimeError(
-    "DM 原始内容："
-    + repr(text[:1500])
-)
+        text = content[0].get("text", "").strip()
+        if not text:
+            continue
+
+        # 正常情况下 text 是 {"data": ...}；兼容可能附带的文字前缀
+        json_start = text.find("{")
+        if json_start < 0:
+            continue
+
+        try:
+            body = json.JSONDecoder().raw_decode(text[json_start:])[0]
+        except json.JSONDecodeError:
+            continue
+
+        if isinstance(body, dict) and "data" in body:
+            return body["data"]
+
+    raise RuntimeError("DM 未返回可用数据：" + raw[:1000])
 
 
 today = date.today()
 week_start = today - timedelta(days=6)
 
-# 国债 10Y 近三个月收益率曲线
+# 一、近三个月：中债国债 10Y 收益率曲线
 curve_rows = []
 cursor = today - timedelta(days=89)
 
 while cursor <= today:
     end_date = min(cursor + timedelta(days=29), today)
 
-    curve_rows += dm_call(
+    result = dm_call(
         "market",
         "bond_yield_curve",
         {
@@ -90,12 +102,17 @@ while cursor <= today:
         },
     )
 
+    if isinstance(result, list):
+        curve_rows.extend(result)
+
     cursor = end_date + timedelta(days=1)
 
 ten_year_map = {
-    row["valuation_date"]: row.get("yield")
+    row.get("valuation_date"): row.get("yield")
     for row in curve_rows
-    if str(row.get("curve_term")) in ("10", "10.0")
+    if row.get("valuation_date")
+    and str(row.get("curve_term")) in ("10", "10.0")
+    and row.get("yield") is not None
 }
 
 ten_year_curve = [
@@ -103,8 +120,8 @@ ten_year_curve = [
     for date_value in sorted(ten_year_map)
 ]
 
-# 国债一级发行
-primary_rows = dm_call(
+# 二、近一周：国债一级发行
+primary_result = dm_call(
     "primary",
     "bond_primary_data",
     {
@@ -116,7 +133,11 @@ primary_rows = dm_call(
     },
 )
 
-raw_issues = primary_rows[0].get("list", []) if primary_rows else []
+if isinstance(primary_result, list) and primary_result:
+    raw_issues = primary_result[0].get("list", [])
+else:
+    raw_issues = []
+
 treasury_issues = []
 
 for row in raw_issues:
@@ -141,10 +162,12 @@ for row in raw_issues:
     treasury_issues.append(
         {
             "date": row.get("subscribe_date"),
+            # 固定使用券号，例如 260020.IB
             "code": row.get("security_id"),
+            # 原始期限直接展示，不在页面再拼 Y
             "tenor": row.get("bond_issue_tenor"),
-            # DM 原始金额按万元处理，转换为亿元
-            "amount": (row.get("actu_issue_amount") or 0) / 10000,
+            # DM 原始金额单位为万元，换算为亿元
+            "amount": round((row.get("actu_issue_amount") or 0) / 10000, 2),
             "yield": yield_value,
             "yield_label": yield_label,
             "multiple": row.get("compliant_subscription_mult"),
@@ -156,8 +179,8 @@ treasury_issues.sort(
     reverse=True,
 )
 
-# 政府债缴款
-government_rows = dm_call(
+# 三、近一周：仅保留政府债缴款，不展示公开市场净投放
+government_result = dm_call(
     "money",
     "fund_calendar",
     {
@@ -168,13 +191,21 @@ government_rows = dm_call(
     },
 )
 
-government_payments = [
-    {
-        "date": row.get("data_date"),
-        "net": row.get("gov_net_payment"),
-    }
-    for row in government_rows
-]
+government_payments = []
+
+if isinstance(government_result, list):
+    for row in government_result:
+        government_payments.append(
+            {
+                "date": row.get("data_date"),
+                "net": row.get("gov_net_payment"),
+            }
+        )
+
+government_payments.sort(
+    key=lambda item: item.get("date") or "",
+    reverse=True,
+)
 
 output = {
     "as_of": today.isoformat(),
@@ -184,4 +215,4 @@ output = {
 }
 
 with open("data.json", "w", encoding="utf-8") as file:
-    json.dump(output, file, ensure_ascii=False)
+    json.dump(output, file, ensure_ascii=False, indent=2)
