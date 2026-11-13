@@ -240,6 +240,10 @@
     {
       "date": "2026-11-12",
       "yield": 1.6032
+    },
+    {
+      "date": "2026-11-13",
+      "yield": 1.6123
     }
   ],
   "treasury_issues": [
@@ -247,7 +251,7 @@
       "date": "2026-11-13",
       "code": "260023.IB",
       "tenor": "10Y",
-      "amount": 800.0,
+      "amount": 802.8,
       "yield": 1.56,
       "yield_label": "发行收益率",
       "multiple": 4.32
