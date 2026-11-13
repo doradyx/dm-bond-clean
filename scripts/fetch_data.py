@@ -60,12 +60,10 @@ def dm_call(service, tool_name, params):
     if position >= 0
 )
 
-    body = json.JSONDecoder().raw_decode(text[json_start:])[0]
-
-    if not isinstance(body, dict) or "data" not in body:
-        raise RuntimeError(f"DM 返回无 data 字段：{body}")
-
-    return body["data"]
+    raise RuntimeError(
+    "DM 原始内容："
+    + repr(text[:1500])
+)
 
 
 today = date.today()
