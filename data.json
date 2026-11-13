@@ -248,18 +248,18 @@
       "code": "260023.IB",
       "tenor": "10Y",
       "amount": 800.0,
-      "yield": null,
-      "yield_label": "边际收益率",
-      "multiple": null
+      "yield": 1.56,
+      "yield_label": "发行收益率",
+      "multiple": 4.32
     },
     {
       "date": "2026-11-13",
       "code": "260022.IB",
       "tenor": "3Y",
       "amount": 1200.0,
-      "yield": null,
-      "yield_label": "边际收益率",
-      "multiple": null
+      "yield": 1.22,
+      "yield_label": "发行收益率",
+      "multiple": 3.07
     },
     {
       "date": "2026-11-11",
