@@ -54,9 +54,15 @@ def dm_call(service, tool_name, params):
         raise RuntimeError(f"DM 返回内容为空：{raw[:500]}")
 
     # DM 偶尔会拼接多段 JSON；只读取第一段完整 JSON
-    body = json.JSONDecoder().raw_decode(text)[0]
+    json_start = min(
+    position
+    for position in (text.find("{"), text.find("["))
+    if position >= 0
+)
 
-    if "data" not in body:
+    body = json.JSONDecoder().raw_decode(text[json_start:])[0]
+
+    if not isinstance(body, dict) or "data" not in body:
         raise RuntimeError(f"DM 返回无 data 字段：{body}")
 
     return body["data"]
