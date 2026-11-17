@@ -1,10 +1,6 @@
 {
-  "as_of": "2026-11-16",
+  "as_of": "2026-11-17",
   "ten_year_yield_curve": [
-    {
-      "date": "2026-08-19",
-      "yield": 1.6831
-    },
     {
       "date": "2026-08-20",
       "yield": 1.6832
@@ -278,27 +274,13 @@
       "yield": 1.0506,
       "yield_label": "综合收益率",
       "multiple": 3.12
-    },
-    {
-      "date": "2026-11-10",
-      "code": "261709.BC",
-      "tenor": "3Y",
-      "amount": 249.04,
-      "yield": 1.63,
-      "yield_label": "发行收益率",
-      "multiple": null
-    },
-    {
-      "date": "2026-11-10",
-      "code": "261710.BC",
-      "tenor": "5Y",
-      "amount": 304.39,
-      "yield": 1.7,
-      "yield_label": "发行收益率",
-      "multiple": null
     }
   ],
   "government_payments": [
+    {
+      "date": "2026-11-17",
+      "net": -107.67
+    },
     {
       "date": "2026-11-16",
       "net": 2294.75
@@ -322,10 +304,6 @@
     {
       "date": "2026-11-11",
       "net": 790.11
-    },
-    {
-      "date": "2026-11-10",
-      "net": -74.86
     }
   ]
 }
