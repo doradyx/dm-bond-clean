@@ -236,6 +236,10 @@
     {
       "date": "2026-11-17",
       "yield": 1.6055
+    },
+    {
+      "date": "2026-11-18",
+      "yield": 1.5892
     }
   ],
   "treasury_issues": [
@@ -261,7 +265,7 @@
       "date": "2026-11-18",
       "code": "269975.IB",
       "tenor": "91D",
-      "amount": 600.0,
+      "amount": 601.2,
       "yield": 1.1061,
       "yield_label": "综合收益率",
       "multiple": 2.67
