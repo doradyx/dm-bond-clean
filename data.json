@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-11-19",
+  "as_of": "2026-11-20",
   "ten_year_yield_curve": [
     {
       "date": "2026-08-24",
@@ -236,9 +236,35 @@
     {
       "date": "2026-11-18",
       "yield": 1.5892
+    },
+    {
+      "date": "2026-11-19",
+      "yield": 1.5755
+    },
+    {
+      "date": "2026-11-20",
+      "yield": 1.5803
     }
   ],
   "treasury_issues": [
+    {
+      "date": "2026-11-20",
+      "code": "260018.IB",
+      "tenor": "2Y",
+      "amount": 1200.0,
+      "yield": 1.23,
+      "yield_label": "发行收益率",
+      "multiple": 3.27
+    },
+    {
+      "date": "2026-11-20",
+      "code": "260021.IB",
+      "tenor": "30Y",
+      "amount": 250.0,
+      "yield": 2.06,
+      "yield_label": "发行收益率",
+      "multiple": 5.93
+    },
     {
       "date": "2026-11-18",
       "code": "269974.IB",
@@ -265,27 +291,13 @@
       "yield": 1.1061,
       "yield_label": "综合收益率",
       "multiple": 2.67
-    },
-    {
-      "date": "2026-11-13",
-      "code": "260023.IB",
-      "tenor": "10Y",
-      "amount": 802.8,
-      "yield": 1.56,
-      "yield_label": "发行收益率",
-      "multiple": 4.32
-    },
-    {
-      "date": "2026-11-13",
-      "code": "260022.IB",
-      "tenor": "3Y",
-      "amount": 1200.0,
-      "yield": 1.22,
-      "yield_label": "发行收益率",
-      "multiple": 3.07
     }
   ],
   "government_payments": [
+    {
+      "date": "2026-11-20",
+      "net": 766.56
+    },
     {
       "date": "2026-11-19",
       "net": 1976.4
@@ -309,10 +321,6 @@
     {
       "date": "2026-11-14",
       "net": -90.0
-    },
-    {
-      "date": "2026-11-13",
-      "net": 1005.0
     }
   ]
 }
