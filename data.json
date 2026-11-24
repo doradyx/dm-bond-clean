@@ -236,6 +236,10 @@
     {
       "date": "2026-11-23",
       "yield": 1.5861
+    },
+    {
+      "date": "2026-11-24",
+      "yield": 1.5853
     }
   ],
   "treasury_issues": [
@@ -243,7 +247,7 @@
       "date": "2026-11-24",
       "code": "260024.IB",
       "tenor": "5Y",
-      "amount": 1200.0,
+      "amount": 1206.8,
       "yield": 1.29,
       "yield_label": "发行收益率",
       "multiple": 2.81
@@ -252,7 +256,7 @@
       "date": "2026-11-24",
       "code": "260023.IB",
       "tenor": "10Y",
-      "amount": 800.0,
+      "amount": 809.9,
       "yield": 1.56,
       "yield_label": "发行收益率",
       "multiple": 4.91
